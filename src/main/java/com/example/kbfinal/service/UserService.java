@@ -2,6 +2,7 @@ package com.example.kbfinal.service;
 
 import com.example.kbfinal.dto.UpdateUserRequest;
 import com.example.kbfinal.entity.User;
+import com.example.kbfinal.exception.KbFinalException;
 import com.example.kbfinal.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.example.kbfinal.exception.KbFinalErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,6 @@ public class UserService {
         // 비밀번호를 암호화하여 저장
         // password를 인코딩
         // user entity에 인코딩 된 password를 넣기
-        System.out.println("registerUser와쬬용!");
         String rawPassword = user.getPassword();
         System.out.println("rawPassword : " + rawPassword);
         String encodedPassword = passwordEncoder.encode(rawPassword);
@@ -40,7 +42,8 @@ public class UserService {
     // 유저 정보 수정
     public User update(long id, UpdateUserRequest request){
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+                //.orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+                .orElseThrow(() -> new KbFinalException(USER_NOT_FOUND)); //global exception 처리
 
         user.update(request.getUsername(), request.getPassword(), request.getAddress(), request.getBirthday(), request.getEmail());
         return user;
@@ -49,7 +52,10 @@ public class UserService {
 
     // 유저 정보 삭제
     public void delete(long id){
+        userRepository.findById(id)
+                .orElseThrow(() -> new KbFinalException(USER_NOT_FOUND)); //global exception 처리
         userRepository.deleteById(id);
+
     }
 
 
@@ -73,7 +79,6 @@ public class UserService {
 
         // 사용자 조회
         User user = userRepository.findByUsername(username); // 직접 repo에서 구현
-        System.out.println("user 있니?" + user);
         if (user == null) {
             return false;
         }

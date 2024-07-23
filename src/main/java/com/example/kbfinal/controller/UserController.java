@@ -1,11 +1,10 @@
 package com.example.kbfinal.controller;
 
-import com.example.kbfinal.dto.AddUserRequest;
-import com.example.kbfinal.dto.AuthUserRequest;
-import com.example.kbfinal.dto.UpdateUserRequest;
-import com.example.kbfinal.dto.UserResponse;
+import com.example.kbfinal.dto.*;
 import com.example.kbfinal.entity.User;
+import com.example.kbfinal.exception.KbFinalException;
 import com.example.kbfinal.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -22,7 +21,6 @@ public class UserController {
     // user 정보를 입력하는 API 생성
     @PostMapping("/api/users")
     public ResponseEntity<User> addUser(@RequestBody AddUserRequest request){
-        System.out.println("user 생성하기");
         User savedUser = userService.registerUser(request.toEntity());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -77,4 +75,5 @@ public class UserController {
         boolean result = userService.authenticate(username,password);
         return result;
     }
+
 }
